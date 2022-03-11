@@ -144,6 +144,24 @@ def audit_switch_list(audit_list):
     for switch in audit_switch_list:
         switch_list.append(switch['name'].split('.', 1)[0])
     return switch_list
+
+
+def audit_filter(audit_file, filter_file, ) -> None:
+
+    switch_list = ks.file_loader(audit_file)
+    nxos_list = ks.file_loader(filter_file)['Switchlist']
+
+    for switch in switch_list[:]:
+        if switch['name'] not in nxos_list:
+            switch_list.remove(switch)
+
+    ks.file_create(
+        audit_file.split('/')[-1],
+        'configs/audit/',
+        switch_list,
+        file_extension='yaml',
+        override=True
+    )
     
 
 if __name__ == "__main__":
