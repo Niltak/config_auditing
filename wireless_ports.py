@@ -56,5 +56,34 @@ def capture_wireless_ports(
     )
 
 
+def auditing_wireless_ports(site_code) -> None:
+    '''
+    '''
+    wireless_file = f'site_info/{site_code}/{site_code}_wireless.yml'
+    switch_port_list = ks.file_loader(wireless_file)
+
+    port_list = []
+    for switch in switch_port_list:
+        found = False
+        port_details = []
+        if not switch['name'] or not switch['output']:
+            continue
+        for port in switch['output']:
+            for details in port['interface_details']:
+                if 'speed' in details:
+                    port_details.append({'interface_name': port['interface_name'], 'interface_details': details})
+                    found = True
+        if found:
+            port_list.append({'name': switch['name'], 'data': port_details})
+
+    ks.file_create(
+        'wireless_ports',
+        'configs/audit/',
+        port_list,
+        file_extension='yml',
+        override=True
+    )
+
+
 if __name__ == "__main__":
     pass
