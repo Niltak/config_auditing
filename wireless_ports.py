@@ -7,6 +7,9 @@ def capture_wireless_ports(
     site_yaml=None,
     pwd=None):
     '''
+    Connect to site switch list and check cdp neighbors for APs.
+    Create and send a command list of ports for APs.
+    Outputs switch port list of interface configs for APs.
     '''
     if not pwd:
         pwd = ks.verify_pwd(user)
@@ -58,6 +61,8 @@ def capture_wireless_ports(
 
 def auditing_wireless_ports(site_code) -> None:
     '''
+    Search site wireless list for the speed command.
+    Outputs switch list of speed commands.
     '''
     wireless_file = f'site_info/{site_code}/{site_code}_wireless.yml'
     switch_port_list = ks.file_loader(wireless_file)
