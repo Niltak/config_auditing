@@ -34,7 +34,7 @@ def config_search(
     
     ks.file_create(
         new_file_name,
-        'configs/',
+        'configs/search/',
         new_file_data,
         file_extension='yaml',
         override=True
@@ -94,7 +94,7 @@ def config_search_audit(
 
     ks.file_create(
         new_file_name,
-        'configs/audit/',
+        'configs/search/audit/',
         search_list,
         file_extension='yaml',
         override=True
@@ -128,7 +128,7 @@ def switch_list_lookup(
 
     ks.file_create(
         file_name,
-        'configs/audit',
+        'configs/search/audit',
         switch_list_lookup,
         file_extension='yml'
     )
@@ -157,7 +157,7 @@ def audit_filter(audit_file, filter_file, ) -> None:
 
     ks.file_create(
         audit_file.split('/')[-1],
-        'configs/audit/',
+        'configs/search/audit',
         switch_list,
         file_extension='yaml',
         override=True
