@@ -134,18 +134,6 @@ def switch_list_lookup(
     )
 
 
-def audit_switch_list(audit_list):
-    '''
-    Loads audit file and pulls switches in the file.
-    Returns a list of switches.
-    '''
-    switch_list = []
-    audit_switch_list = ks.file_loader(audit_list)
-    for switch in audit_switch_list:
-        switch_list.append(switch['name'].split('.', 1)[0])
-    return switch_list
-
-
 def audit_filter(audit_file, filter_file, ) -> None:
 
     switch_list = ks.file_loader(audit_file)
@@ -162,6 +150,27 @@ def audit_filter(audit_file, filter_file, ) -> None:
         file_extension='yaml',
         override=True
     )
+
+
+def audit_switch_list(audit_list):
+    '''
+    Loads audit file and pulls switches in the file.
+    Returns a list of switches.
+    '''
+    switch_list = []
+    audit_switch_list = ks.file_loader(audit_list)
+    for switch in audit_switch_list:
+        switch_list.append(switch['name'].split('.', 1)[0])
+    return switch_list
+
+
+def format_audit_switch_list(audit_list, user, pwd=None):
+    '''
+    Formats a list of switches based on an audit file.
+    Returns a list of switches ready for connection functions.
+    '''
+    switch_list = audit_switch_list(audit_list)
+    return ks.format_switch_list(switch_list, user, pwd=pwd)
     
 
 if __name__ == "__main__":
