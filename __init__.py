@@ -36,7 +36,7 @@ def config_search(
         new_file_name,
         'configs/search/',
         new_file_data,
-        file_extension='yaml',
+        file_extension='yml',
         override=True
     )
 
@@ -96,7 +96,7 @@ def config_search_audit(
         new_file_name,
         'configs/search/audit/',
         search_list,
-        file_extension='yaml',
+        file_extension='yml',
         override=True
     )
 
@@ -147,7 +147,7 @@ def audit_filter(audit_file, filter_file, ) -> None:
         audit_file.split('/')[-1],
         'configs/search/audit',
         switch_list,
-        file_extension='yaml',
+        file_extension='yml',
         override=True
     )
 
