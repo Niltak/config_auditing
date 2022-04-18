@@ -7,13 +7,13 @@ from config_auditing import config_search, config_search_audit
 
 lookup = 'access_list'
 config_search(
-    f'{lookup}_lookup',                     # File name of the configuration search
-    f'nil_lib/templates/{lookup}.fsm',      # Requires nil_lib to be in the same folder group
     'config_dump/'                          # Path for the switch configuration dump
+    f'nil_lib/templates/{lookup}.fsm',      # Requires nil_lib to be in the same folder group
+    f'{lookup}_lookup',                     # File name of the configuration search
 )
 
 config_search_audit(
-    'remark --Ansible',                     # String lookup in the search output file
+    'remark --Ansible',                     # Keyword lookup in the search output file
     f'configs/search/{lookup}_lookup.yml',  # Search output file to audit
     f'{lookup}_audit'                       # File name of the configuration search
     contains=False                          # String is not found
@@ -23,7 +23,7 @@ config_search_audit(
 ##### Outputs:
 Will generate the following folders and files.
 
-*configs/search/access_list_lookup.yml* -> 
+*configs/search/access_list_lookup.yml* -> Captures all data based on textFSM file
 ```yaml
 - name: test-sw-c3850-01
   data:
@@ -71,7 +71,7 @@ Will generate the following folders and files.
 ```
 
 
-*configs/search/audit/access_list_audit.yml* -> 
+*configs/search/audit/access_list_audit.yml* -> Filter search list with keyword
 ```yaml
 - name: test-sw-c3850-03
   data:
