@@ -1,10 +1,13 @@
 from paramiko import SSHClient, AutoAddPolicy
+from getpass import getpass
 
 
 def rancid_config_download(user, config_dir, pwd=None) -> None:
     '''
     Connects to the rancid server and downloads config files.
     '''
+    if not pwd:
+        pwd = getpass()
     rancid_server = '172.28.248.18'
     rancid_config_dir = '/var/lib/rancid/PURDUE/configs/'
     with SSHClient() as conn:
