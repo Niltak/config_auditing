@@ -4,9 +4,9 @@ import nil_lib as ks
 
 
 def config_search(
-    new_file_name,
-    fsm_template,
     config_dir,
+    fsm_template,
+    new_file_name,
     debug=False) -> None:
     '''
     Uses textFSM file to search through config.
