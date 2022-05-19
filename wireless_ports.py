@@ -14,7 +14,7 @@ def capture_wireless_ports(
     if not pwd:
         pwd = ks.verify_pwd(user)
     if not site_yaml:
-        site_yaml = f'site_info/{site_code}/{site_code}.yaml'
+        site_yaml = f'site_info/{site_code}/{site_code}.yml'
 
     # Checking cdp neighbors for APs
     switch_list = ks.format_site_yaml(
@@ -27,12 +27,17 @@ def capture_wireless_ports(
     for switch in switch_cdp_list:
         if switch['name']:
             wireless_list = []
-            for cdp in switch['output']:
-                if 'AIR-' in cdp['platform']:
-                    wireless_port = f"show run int {cdp['local_port']}"
-                    wireless_list.append(wireless_port)
-            switch_list.append(switch['name'])
-            switch_command_list.append(wireless_list)
+            if not isinstance(switch['output'], list):
+                print(f"FSM did not convert {switch['name']}")
+                continue
+            for cdp_list in switch['output']:
+                for cdp in cdp_list:
+                    if 'AIR-' in cdp['platform']:
+                        wireless_port = f"show run int {cdp['local_port']}"
+                        wireless_list.append(wireless_port)
+            if len(wireless_list) > 0:
+                switch_list.append(switch['name'])
+                switch_command_list.append(wireless_list)
 
     switch_list = ks.format_switch_list(switch_list, user, pwd=pwd)
     switch_list_data = ks.switch_list_send_command(
@@ -46,9 +51,11 @@ def capture_wireless_ports(
         if switch_data['name']:
             del switch_data['host']
             del switch_data['device_type']
-            for i, output in enumerate(switch_data['output']):
+            output_list = []
+            for output in switch_data['output']:
                 for data in output:
-                    switch_data['output'][i] = data
+                    output_list.append(data)
+            switch_data['output'] = output_list
 
     ks.file_create(
         f'{site_code}_wireless',
