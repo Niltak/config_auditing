@@ -31,6 +31,8 @@ def capture_wireless_ports(
                 print(f"FSM did not convert {switch['name']}")
                 continue
             for cdp_list in switch['output']:
+                if not isinstance(cdp_list, list):
+                    cdp_list = [cdp_list]
                 for cdp in cdp_list:
                     if 'AIR-' in cdp['platform']:
                         wireless_port = f"show run int {cdp['local_port']}"
