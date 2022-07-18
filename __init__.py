@@ -7,6 +7,7 @@ def config_search(
     config_dir,
     fsm_template,
     new_file_name,
+    site_folder=True,
     debug=False) -> None:
     '''
     Uses textFSM file to search through config.
@@ -18,9 +19,13 @@ def config_search(
     for subdir, dirs, files in os.walk(config_dir):
         for file_name in files:
             fsm._result = []
-            file_url = f"{config_dir}/{file_name}"
+            if not config_dir.endswith('/'):
+                config_dir = config_dir + '/'
+            file_url = f"{config_dir}{file_name}"
             text_data = ks.file_loader(file_url)
-            
+            if '.txt' in file_name:
+                file_name = file_name.split('.txt')[0]
+
             output = fsm.ParseText(text_data[0])
             output_format = {
                 'name': file_name,
@@ -31,10 +36,14 @@ def config_search(
     if debug:
         print(new_file_data)
         exit()
-    
+
+    file_dir = f'{config_dir}/search/'
+    if not site_folder:
+        file_dir = 'configs/search/'
+
     ks.file_create(
         new_file_name,
-        'configs/search/',
+        file_dir,
         new_file_data,
         file_extension='yml',
         override=True
@@ -48,9 +57,10 @@ def config_search_audit(
     contains=False,
     search_item_key=False,
     # switch_names_filter=None,
-    debug=False
-    ) -> None:
-    # Find switch entries that do not contain search_item in the last yaml entry
+    debug=False) -> None:
+    '''
+    Find switch entries that do not contain search_item in the last yaml entry
+    '''
 
     if not isinstance(search_keywords, list):
         search_keywords = [search_keywords]
@@ -58,7 +68,7 @@ def config_search_audit(
     # if switch_names_filter:
     #     if not isinstance(switch_names_filter, list):
     #         switch_names_filter = [switch_names_filter]
-    
+
     with open(yaml_config_file) as yaml_file:
         switch_list = yaml.load(yaml_file, Loader=yaml.FullLoader)
 
@@ -85,7 +95,7 @@ def config_search_audit(
                     if keyword in data[0]:
                         found = True
         if found == contains:
-            search_list.append(switch) 
+            search_list.append(switch)
 
     if debug:
         for search in search_list:
@@ -102,9 +112,9 @@ def config_search_audit(
 
 
 def switch_list_lookup(
-    switch_list_file,
-    lookup_file,
-    file_name):
+        switch_list_file,
+        lookup_file,
+        file_name):
     '''
     Filters a lookup file based on a list of switch names.
     Creates a file of the filtered switches and their data.
@@ -171,7 +181,7 @@ def format_audit_switch_list(audit_list, user, pwd=None):
     '''
     switch_list = audit_switch_list(audit_list)
     return ks.format_switch_list(switch_list, user, pwd=pwd)
-    
+
 
 if __name__ == "__main__":
     pass
