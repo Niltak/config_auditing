@@ -37,9 +37,10 @@ def config_search(
         print(new_file_data)
         exit()
 
-    file_dir = f'{config_dir}/search/'
-    if not site_folder:
-        file_dir = 'configs/search/'
+    file_dir = 'configs/search/'
+    if site_folder:
+        site_code = config_dir.split('/')[1]
+        file_dir = f'site_info/{site_code}/configs/search/'
 
     ks.file_create(
         new_file_name,
@@ -54,9 +55,9 @@ def config_search_audit(
     search_keywords,
     yaml_config_file,
     new_file_name,
+    site_code=None,
     contains=False,
     search_item_key=False,
-    # switch_names_filter=None,
     debug=False) -> None:
     '''
     Find switch entries that do not contain search_item in the last yaml entry
@@ -65,20 +66,17 @@ def config_search_audit(
     if not isinstance(search_keywords, list):
         search_keywords = [search_keywords]
 
-    # if switch_names_filter:
-    #     if not isinstance(switch_names_filter, list):
-    #         switch_names_filter = [switch_names_filter]
+    if not yaml_config_file.endswith('.yml'):
+        yaml_config_file += '.yml'
+
+    if site_code:
+        yaml_config_file = f'site_info/{site_code}/configs/search/{yaml_config_file}'
 
     with open(yaml_config_file) as yaml_file:
         switch_list = yaml.load(yaml_file, Loader=yaml.FullLoader)
 
     search_list = []
     for switch in switch_list:
-        # if switch_names_filter:
-        #     found = False
-        #     for switch_name_filter in switch_names_filter:
-        #         if switch_name_filter not in switch['name']:
-        #             continue
         found = False
         for data in switch['data']:
             if len(data) > 1:
@@ -102,9 +100,13 @@ def config_search_audit(
             print(search)
         exit()
 
+    file_dir = 'configs/audit/'
+    if site_code:
+        file_dir = f'site_info/{site_code}/{file_dir}'
+
     ks.file_create(
         new_file_name,
-        'configs/search/audit/',
+        file_dir,
         search_list,
         file_extension='yml',
         override=True
@@ -138,7 +140,7 @@ def switch_list_lookup(
 
     ks.file_create(
         file_name,
-        'configs/search/audit',
+        'configs/audit',
         switch_list_lookup,
         file_extension='yml'
     )
