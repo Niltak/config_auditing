@@ -23,7 +23,7 @@ def config_search(
                 config_dir = config_dir + '/'
             file_url = f"{config_dir}{file_name}"
             text_data = ks.file_loader(file_url)
-            if '.txt' in file_name:
+            if file_name.endswith('.txt'):
                 file_name = file_name.split('.txt')[0]
 
             output = fsm.ParseText(text_data[0])
