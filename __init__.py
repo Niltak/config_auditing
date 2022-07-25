@@ -111,7 +111,10 @@ def config_audit_interfaces(
     file_name,
     site_code=None,
     contains=False,
-    interface_name_filter=None,
+    filter_interface_name=None,
+    filter_description=None,
+    filter_trunk_port=False,
+    filter_port_channel=False,
     debug=False) -> None:
     '''
     Find switch entries that do not contain search_item within interfaces
@@ -132,10 +135,19 @@ def config_audit_interfaces(
         found = False
         interface_list = []
         for data in switch['data']:
-            if interface_name_filter:
-                if interface_name_filter not in data[0]:
+            if filter_interface_name:
+                if filter_interface_name not in data[0]:
                     continue
             interface = data[1]
+            if filter_trunk_port:
+                if 'switchport mode trunk' in interface:
+                    continue
+            if filter_port_channel:
+                if 'channel-group' in interface:
+                    continue
+            if filter_description:
+                if filter_description not in interface:
+                    continue
             for keyword in search_keywords:
                 if contains:
                     if keyword in interface:
