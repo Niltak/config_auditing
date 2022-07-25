@@ -62,7 +62,6 @@ def config_search_audit(
     '''
     Find switch entries that do not contain search_item in the last yaml entry
     '''
-
     if not isinstance(search_keywords, list):
         search_keywords = [search_keywords]
 
@@ -75,7 +74,7 @@ def config_search_audit(
     with open(yaml_config_file) as yaml_file:
         switch_list = yaml.load(yaml_file, Loader=yaml.FullLoader)
 
-    search_list = []
+    search_results = []
     for switch in switch_list:
         found = False
         for data in switch['data']:
@@ -93,10 +92,10 @@ def config_search_audit(
                     if keyword in data[0]:
                         found = True
         if found == contains:
-            search_list.append(switch)
+            search_results.append(switch)
 
     if debug:
-        for search in search_list:
+        for search in search_results:
             print(search)
         exit()
 
@@ -107,7 +106,65 @@ def config_search_audit(
     ks.file_create(
         new_file_name,
         file_dir,
-        search_list,
+        search_results,
+        file_extension='yml',
+        override=True
+    )
+
+
+def config_search_audit_interfaces(
+    search_keywords,
+    yaml_config_file,
+    new_file_name,
+    site_code=None,
+    contains=False,
+    interface_name_filter=None,
+    debug=False) -> None:
+    '''
+    Find switch entries that do not contain search_item within interfaces
+    '''
+    if not isinstance(search_keywords, list):
+        search_keywords = [search_keywords]
+    if not yaml_config_file.endswith('.yml'):
+        yaml_config_file += '.yml'
+    if site_code:
+        yaml_config_file = f'site_info/{site_code}/configs/search/{yaml_config_file}'
+
+    switch_list = ks.file_loader(yaml_config_file)
+    search_results = []
+    for switch in switch_list:
+        found = False
+        interface_list = []
+        for data in switch['data']:
+            if interface_name_filter:
+                if interface_name_filter not in data[0]:
+                    continue
+            interface = data[1]
+            for keyword in search_keywords:
+                if contains:
+                    if keyword in interface:
+                        found = True
+                        interface_list.append(data)
+                if not contains:
+                    if keyword not in interface:
+                        found = True
+                        interface_list.append(data)
+        if found:
+            search_results.append({'name': switch['name'], 'data': interface_list})
+
+    if debug:
+        for search in search_results:
+            print(search)
+        exit()
+
+    file_dir = 'configs/audit/'
+    if site_code:
+        file_dir = f'site_info/{site_code}/{file_dir}'
+
+    ks.file_create(
+        new_file_name,
+        file_dir,
+        search_results,
         file_extension='yml',
         override=True
     )
