@@ -51,7 +51,7 @@ def config_search(
     )
 
 
-def config_search_audit(
+def config_audit(
     search_keywords,
     yaml_config_file,
     new_file_name,
@@ -112,7 +112,7 @@ def config_search_audit(
     )
 
 
-def config_search_audit_interfaces(
+def config_audit_interfaces(
     search_keywords,
     yaml_config_file,
     new_file_name,
