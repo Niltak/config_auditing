@@ -1,51 +1,49 @@
 import os
-import yaml
 import nil_lib as ks
 
 
 def config_search(
-    config_dir,
+    site_code,
     fsm_template,
-    new_file_name,
-    site_folder=True,
+    file_name,
+    config_dir=None,
     debug=False) -> None:
     '''
     Uses textFSM file to search through config.
     Creates file of the searched config findings.
     '''
+    if not config_dir:
+        config_dir = f'site_info/{site_code}/configs/dump/'
+        file_dir = f'site_info/{site_code}/configs/search/'
+    else:
+        if not config_dir.endswith('/'):
+            config_dir = config_dir + '/'
+        file_dir = 'configs/search/'
+
+    fsm_template = f'nil_lib/templates/{fsm_template}.fsm'
+
+    data_results = []
     fsm = ks.file_loader(fsm_template)
-
-    new_file_data = []
     for subdir, dirs, files in os.walk(config_dir):
-        for file_name in files:
+        for switch_name in files:
             fsm._result = []
-            if not config_dir.endswith('/'):
-                config_dir = config_dir + '/'
-            file_url = f"{config_dir}{file_name}"
-            text_data = ks.file_loader(file_url)
-            if file_name.endswith('.txt'):
-                file_name = file_name.split('.txt')[0]
+            switch_config = ks.file_loader(
+                f'{config_dir}{switch_name}')
+            if switch_name.endswith('.txt'):
+                switch_name = switch_name.split('.txt')[0]
 
-            output = fsm.ParseText(text_data[0])
-            output_format = {
-                'name': file_name,
-                'data': output
-            }
-            new_file_data.append(output_format)
+            switch_data = fsm.ParseText(switch_config[0])
+            data_results.append(
+                {'name': switch_name, 'data': switch_data})
 
     if debug:
-        print(new_file_data)
+        print(data_results)
         exit()
 
-    file_dir = 'configs/search/'
-    if site_folder:
-        site_code = config_dir.split('/')[1]
-        file_dir = f'site_info/{site_code}/configs/search/'
-
     ks.file_create(
-        new_file_name,
+        file_name,
         file_dir,
-        new_file_data,
+        data_results,
         file_extension='yml',
         override=True
     )
@@ -53,8 +51,8 @@ def config_search(
 
 def config_audit(
     search_keywords,
-    yaml_config_file,
-    new_file_name,
+    search_file,
+    file_name,
     site_code=None,
     contains=False,
     search_item_key=False,
@@ -64,17 +62,16 @@ def config_audit(
     '''
     if not isinstance(search_keywords, list):
         search_keywords = [search_keywords]
+    if not search_file.endswith('.yml'):
+        search_file += '.yml'
 
-    if not yaml_config_file.endswith('.yml'):
-        yaml_config_file += '.yml'
-
+    file_dir = 'configs/audit/'
     if site_code:
-        yaml_config_file = f'site_info/{site_code}/configs/search/{yaml_config_file}'
-
-    with open(yaml_config_file) as yaml_file:
-        switch_list = yaml.load(yaml_file, Loader=yaml.FullLoader)
+        file_dir = f'site_info/{site_code}/{file_dir}'
+        search_file = f'site_info/{site_code}/configs/search/{search_file}'
 
     search_results = []
+    switch_list = ks.file_loader(search_file)
     for switch in switch_list:
         found = False
         for data in switch['data']:
@@ -99,12 +96,8 @@ def config_audit(
             print(search)
         exit()
 
-    file_dir = 'configs/audit/'
-    if site_code:
-        file_dir = f'site_info/{site_code}/{file_dir}'
-
     ks.file_create(
-        new_file_name,
+        file_name,
         file_dir,
         search_results,
         file_extension='yml',
@@ -114,8 +107,8 @@ def config_audit(
 
 def config_audit_interfaces(
     search_keywords,
-    yaml_config_file,
-    new_file_name,
+    search_file,
+    file_name,
     site_code=None,
     contains=False,
     interface_name_filter=None,
@@ -125,13 +118,16 @@ def config_audit_interfaces(
     '''
     if not isinstance(search_keywords, list):
         search_keywords = [search_keywords]
-    if not yaml_config_file.endswith('.yml'):
-        yaml_config_file += '.yml'
-    if site_code:
-        yaml_config_file = f'site_info/{site_code}/configs/search/{yaml_config_file}'
+    if not search_file.endswith('.yml'):
+        search_file += '.yml'
 
-    switch_list = ks.file_loader(yaml_config_file)
+    file_dir = 'configs/audit/'
+    if site_code:
+        file_dir = f'site_info/{site_code}/{file_dir}'
+        search_file = f'site_info/{site_code}/configs/search/{search_file}'
+
     search_results = []
+    switch_list = ks.file_loader(search_file)
     for switch in switch_list:
         found = False
         interface_list = []
@@ -157,12 +153,8 @@ def config_audit_interfaces(
             print(search)
         exit()
 
-    file_dir = 'configs/audit/'
-    if site_code:
-        file_dir = f'site_info/{site_code}/{file_dir}'
-
     ks.file_create(
-        new_file_name,
+        file_name,
         file_dir,
         search_results,
         file_extension='yml',
@@ -180,9 +172,8 @@ def switch_list_lookup(
     '''
     switch_list = ks.file_loader(switch_list_file)['Switchlist']
     lookup_list = ks.file_loader(lookup_file)
-    switch_list_lookup = []
-    switch_list_missing = []
 
+    switch_list_lookup, switch_list_missing = [], []
     for switch in switch_list:
         lookup = ks.search_within_list(
             switch, lookup_list, 'name')
@@ -203,7 +194,7 @@ def switch_list_lookup(
     )
 
 
-def audit_filter(audit_file, filter_file, ) -> None:
+def audit_filter(audit_file, filter_file) -> None:
 
     switch_list = ks.file_loader(audit_file)
     nxos_list = ks.file_loader(filter_file)['Switchlist']

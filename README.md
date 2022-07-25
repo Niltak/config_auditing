@@ -2,20 +2,20 @@
 
 ##### Example:
 ```python
-from config_auditing import config_search, config_search_audit
+from config_auditing import config_search, config_audit
 
 
 lookup = 'access_list'
 config_search(
-    'config_dump/'                          # Path for the switch configuration dump
-    f'nil_lib/templates/{lookup}.fsm',      # Requires nil_lib to be in the same folder group
+    'test_site_code'                        # Site code
+    lookup,                                 # Requires nil_lib to be in the same folder group
     f'{lookup}_lookup',                     # File name of the configuration search
 )
 
-config_search_audit(
+config_audit(
     'remark --Ansible',                     # Keyword lookup in the search output file
     f'configs/search/{lookup}_lookup.yml',  # Search output file to audit
-    f'{lookup}_audit'                       # File name of the configuration search
+    f'{lookup}_audit',                      # File name of the configuration search
     contains=False                          # String is not found
 )
 ```
