@@ -50,10 +50,10 @@ def config_search(
 
 
 def config_audit(
+    site_code,
     search_keywords,
     search_file,
     file_name,
-    site_code=None,
     contains=False,
     search_item_key=False,
     debug=False) -> None:
@@ -65,13 +65,10 @@ def config_audit(
     if not search_file.endswith('.yml'):
         search_file += '.yml'
 
-    file_dir = 'configs/audit/'
-    if site_code:
-        file_dir = f'site_info/{site_code}/{file_dir}'
-        search_file = f'site_info/{site_code}/configs/search/{search_file}'
+    default_dir = f'site_info/{site_code}/configs'
 
     search_results = []
-    switch_list = ks.file_loader(search_file)
+    switch_list = ks.file_loader(f'{default_dir}/search/{search_file}')
     for switch in switch_list:
         found = False
         for data in switch['data']:
@@ -98,7 +95,7 @@ def config_audit(
 
     ks.file_create(
         file_name,
-        file_dir,
+        f'{default_dir}/audit/',
         search_results,
         file_extension='yml',
         override=True
