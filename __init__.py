@@ -5,13 +5,15 @@ import nil_lib as ks
 def config_search(
     site_code,
     fsm_template,
-    file_name,
+    file_name=None,
     config_dir=None,
     debug=False) -> None:
     '''
     Uses textFSM file to search through config.
     Creates file of the searched config findings.
     '''
+    if not file_name:
+        file_name = fsm_template
     if not config_dir:
         config_dir = f'site_info/{site_code}/configs/dump/'
         file_dir = f'site_info/{site_code}/configs/search/'
@@ -19,8 +21,8 @@ def config_search(
         if not config_dir.endswith('/'):
             config_dir = config_dir + '/'
         file_dir = 'configs/search/'
-
-    fsm_template = f'nil_lib/templates/{fsm_template}.fsm'
+    if not fsm_template.endswith('.fsm'):
+        fsm_template = f'nil_lib/templates/{fsm_template}.fsm'
 
     data_results = []
     fsm = ks.file_loader(fsm_template)
@@ -53,9 +55,9 @@ def config_audit(
     site_code,
     search_keywords,
     search_file,
-    file_name,
     contains=False,
-    search_item_key=False,
+    file_name=None,
+    search_item_key=None,
     debug=False) -> None:
     '''
     Find switch entries that do not contain search_item in the last yaml entry
@@ -64,6 +66,8 @@ def config_audit(
         search_keywords = [search_keywords]
     if not search_file.endswith('.yml'):
         search_file += '.yml'
+    if not file_name:
+        file_name = search_file
 
     default_dir = f'site_info/{site_code}/configs'
 
@@ -172,9 +176,9 @@ def config_audit_interfaces(
 
 
 def switch_list_lookup(
-        switch_list_file,
-        lookup_file,
-        file_name):
+    switch_list_file,
+    lookup_file,
+    file_name):
     '''
     Filters a lookup file based on a list of switch names.
     Creates a file of the filtered switches and their data.
