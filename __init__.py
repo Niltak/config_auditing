@@ -67,7 +67,7 @@ def config_audit(
     if not search_file.endswith('.yml'):
         search_file += '.yml'
     if not file_name:
-        file_name = search_file
+        file_name = search_file.split('.yml')[0]
 
     default_dir = f'site_info/{site_code}/configs'
 
