@@ -51,7 +51,7 @@ def config_search(
 
 def config_audit(
     search_keywords,
-    search_file,
+    config_search_file,
     file_name,
     site_code=None,
     contains=False,
@@ -62,16 +62,16 @@ def config_audit(
     '''
     if not isinstance(search_keywords, list):
         search_keywords = [search_keywords]
-    if not search_file.endswith('.yml'):
-        search_file += '.yml'
+    if not config_search_file.endswith('.yml'):
+        config_search_file += '.yml'
 
     file_dir = 'configs/audit/'
     if site_code:
         file_dir = f'site_info/{site_code}/{file_dir}'
-        search_file = f'site_info/{site_code}/configs/search/{search_file}'
+        config_search_file = f'site_info/{site_code}/configs/search/{config_search_file}'
 
     search_results = []
-    switch_list = ks.file_loader(search_file)
+    switch_list = ks.file_loader(config_search_file)
     for switch in switch_list:
         found = False
         for data in switch['data']:
@@ -107,7 +107,7 @@ def config_audit(
 
 def config_audit_interfaces(
     search_keywords,
-    search_file,
+    config_search_file,
     file_name,
     site_code=None,
     contains=False,
@@ -121,16 +121,16 @@ def config_audit_interfaces(
     '''
     if not isinstance(search_keywords, list):
         search_keywords = [search_keywords]
-    if not search_file.endswith('.yml'):
-        search_file += '.yml'
+    if not config_search_file.endswith('.yml'):
+        config_search_file += '.yml'
 
     file_dir = 'configs/audit/'
     if site_code:
         file_dir = f'site_info/{site_code}/{file_dir}'
-        search_file = f'site_info/{site_code}/configs/search/{search_file}'
+        config_search_file = f'site_info/{site_code}/configs/search/{config_search_file}'
 
     search_results = []
-    switch_list = ks.file_loader(search_file)
+    switch_list = ks.file_loader(config_search_file)
     for switch in switch_list:
         found = False
         interface_list = []
@@ -207,7 +207,8 @@ def switch_list_lookup(
 
 
 def audit_filter(audit_file, filter_file) -> None:
-
+    '''
+    '''
     switch_list = ks.file_loader(audit_file)
     nxos_list = ks.file_loader(filter_file)['Switchlist']
 
@@ -224,7 +225,7 @@ def audit_filter(audit_file, filter_file) -> None:
     )
 
 
-def audit_switch_list(audit_list):
+def audit_switch_list(audit_list, delimiter='.'):
     '''
     Loads audit file and pulls switches in the file.
     Returns a list of switches.
@@ -232,7 +233,7 @@ def audit_switch_list(audit_list):
     switch_list = []
     audit_switch_list = ks.file_loader(audit_list)
     for switch in audit_switch_list:
-        switch_list.append(switch['name'].split('.', 1)[0])
+        switch_list.append(switch['name'].split(delimiter, 1)[0])
     return switch_list
 
 
