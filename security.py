@@ -4,6 +4,9 @@ from nil_lib import format_switch_list, switch_list_send_command, file_loader, f
 def rogue_bpdu_switches(switch_list, user, pwd=None) -> None:
     '''
     '''
+    if switch_list.endswith('.yml'):
+        switch_list = file_loader(switch_list)
+
     switch_list = format_switch_list(
         switch_list, user, pwd=pwd)
 
@@ -26,10 +29,10 @@ def rogue_bpdu_switches(switch_list, user, pwd=None) -> None:
         switch['output'][1] = fsm_interfaces.ParseTextToDicts(
             switch['output'][1])
 
-        interface_check = []
+        portfast_list, non_portfast_list = [], []
         for spanning_entry in switch['output'][0]:
             if ('Port-channel' not in spanning_entry['INTERFACE']
-                and spanning_entry['INTERFACE'] not in interface_check):
+                and spanning_entry['INTERFACE'] not in portfast_list):
                 if spanning_entry['BPDU_RECIEVE'] != '0':
                     for int_entry in switch['output'][1]:
                         # Find interface configs
@@ -37,24 +40,34 @@ def rogue_bpdu_switches(switch_list, user, pwd=None) -> None:
                             found = False
                             for int_details in int_entry['INTERFACE_DETAILS']:
                                 if 'portfast' in int_details:
-                                    interface_check.append(spanning_entry['INTERFACE'])
+                                    portfast_list.append(spanning_entry['INTERFACE'])
                                     found = True
                                     break
                             if not found:
                                 # Entry does not have portfast
-                                int_entry['SWITCH_NAME'] = switch['name']
-                                if int_entry not in debug_list:
-                                    debug_list.append(int_entry)
+                                # int_entry['SWITCH_NAME'] = switch['name']
+                                if int_entry not in non_portfast_list:
+                                    non_portfast_list.append(int_entry)
                             else:
                                 break
-        if interface_check:
+        if portfast_list:
             audit_list.append({
-                'name': switch['name'], 'interface': interface_check})
+                'name': switch['name'], 'interface': portfast_list})
+        if non_portfast_list:
+            debug_list.append({
+                'name': switch['name'], 'interface': non_portfast_list})
 
     file_create(
         'rogue_bpdu_switches',
         'logs/audit/',
         audit_list,
+        file_extension='yml',
+        override=True)
+
+    file_create(
+        'rogue_bpdu_non_portfast',
+        'logs/audit/',
+        debug_list,
         file_extension='yml',
         override=True)
 
