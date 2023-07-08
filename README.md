@@ -8,16 +8,12 @@ from config_auditing import config_search, config_audit
 lookup = 'access_list'
 config_search(
     'test_site_code'                        # Site code
-    lookup,                                 # Requires nil_lib to be in the same folder group
-    f'{lookup}_lookup',                     # File name of the configuration search
-)
+    lookup)                                 # Name of template in nil_lib
 
 config_audit(
     'remark --Ansible',                     # Keyword lookup in the search output file
-    f'configs/search/{lookup}_lookup.yml',  # Search output file to audit
-    f'{lookup}_audit',                      # File name of the configuration search
-    contains=False                          # String is not found
-)
+    f'configs/search/{lookup}.yml',         # 'config_search' output file to audit
+    contains=False)                         # If the keyword needs to be in the entry
 ```
 
 ##### Outputs:
