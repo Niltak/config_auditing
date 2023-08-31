@@ -100,11 +100,11 @@ def config_audit(
 
 
 def config_audit_interfaces(
+    site_code,
     search_keywords,
     config_search_file,
-    file_name,
-    site_code=None,
     contains=False,
+    file_name=None,
     filter_interface_name=None,
     filter_description=None,
     filter_trunk_port=False,
@@ -115,16 +115,14 @@ def config_audit_interfaces(
     '''
     if not isinstance(search_keywords, list):
         search_keywords = [search_keywords]
+    if not file_name:
+        file_name = config_search_file.split('.yml')[0]
     if not config_search_file.endswith('.yml'):
         config_search_file += '.yml'
-
-    file_dir = 'configs/audit/'
-    if site_code:
-        file_dir = f'site_info/{site_code}/{file_dir}'
-        config_search_file = f'site_info/{site_code}/configs/search/{config_search_file}'
+    default_dir = f'site_info/{site_code}/configs'
 
     search_results = []
-    switch_list = ks.file_loader(config_search_file)
+    switch_list = ks.file_loader(f'{default_dir}/search/{config_search_file}')
     for switch in switch_list:
         found = False
         interface_list = []
@@ -160,7 +158,7 @@ def config_audit_interfaces(
         exit()
 
     ks.file_create(
-        file_name, file_dir, search_results,
+        file_name, f'{default_dir}/audit/', search_results,
         file_extension='yml', override=True)
 
 
