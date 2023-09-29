@@ -207,25 +207,27 @@ def audit_filter(audit_file, filter_file) -> None:
         file_extension='yml', override=True)
 
 
-def audit_switch_list(audit_list, delimiter='.'):
+def audit_switch_list(site_code, audit_list, delimiter='.'):
     '''
     Loads audit file and pulls switches in the file.
     Returns a list of switches.
     '''
+    
     switch_list = []
-    audit_switch_list = ks.file_loader(audit_list)
+    audit_switch_list = ks.file_loader(
+        f'site_info/{site_code}/configs/audit/{audit_list}.yml')
     for switch in audit_switch_list:
         switch_list.append(switch['name'].split(delimiter, 1)[0])
 
     return switch_list
 
 
-def format_audit_switch_list(audit_list, user, pwd=None):
+def format_audit_switch_list(site_code, audit_list, user, pwd=None):
     '''
     Formats a list of switches based on an audit file.
     Returns a list of switches ready for connection functions.
     '''
-    switch_list = audit_switch_list(audit_list)
+    switch_list = audit_switch_list(site_code, audit_list)
     return ks.format_switch_list(switch_list, user, pwd=pwd)
 
 
