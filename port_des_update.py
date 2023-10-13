@@ -9,6 +9,7 @@ def port_description_update(
     '''
     Updates port description on a list of switches.
     '''
+    # TODO review code
     old_build_code += '-'
     new_build_code += '-'
     change_list = []
@@ -48,7 +49,7 @@ def port_description_update(
             change_log.append(f"int {port['port']}\n")
             change_log.append(f"  description {port['description']}\n")
 
-        ks.make_file(
+        ks.file_create(
             f"port_change_{switch_change['name']}",
             'configs/command_list/',
             change_log,
@@ -56,7 +57,7 @@ def port_description_update(
         )
 
     if debug:
-        ks.make_file(
+        ks.file_create(
             f'port change for building {new_build_code[:-1]}',
             'logs/',
             change_list,
